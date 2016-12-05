@@ -1,0 +1,11 @@
+# depslib dependency file v1.0
+1446667744 source:c:\users\patrick\documents\github\springer-lidl\springerproblem\main.c
+	<stdio.h>
+	<stdlib.h>
+
+1480928617 source:c:\users\patrick\documents\github\springer-lidl\springerproblem\board.c
+	"Board.h"
+	<stdlib.h>
+
+1480928602 c:\users\patrick\documents\github\springer-lidl\springerproblem\board.h
+
