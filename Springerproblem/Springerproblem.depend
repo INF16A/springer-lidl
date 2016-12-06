@@ -1,11 +1,37 @@
 # depslib dependency file v1.0
-1446667744 source:c:\users\patrick\documents\github\springer-lidl\springerproblem\main.c
+1481030749 source:c:\users\patrick\documents\github\springer-lidl\springerproblem\main.c
 	<stdio.h>
 	<stdlib.h>
+	<stdbool.h>
+	"Algorithm.h"
 
-1480928617 source:c:\users\patrick\documents\github\springer-lidl\springerproblem\board.c
+1481029214 source:c:\users\patrick\documents\github\springer-lidl\springerproblem\board.c
 	"Board.h"
 	<stdlib.h>
+	<stdio.h>
 
-1480928602 c:\users\patrick\documents\github\springer-lidl\springerproblem\board.h
+1481012953 c:\users\patrick\documents\github\springer-lidl\springerproblem\board.h
+
+1481031157 source:c:\users\patrick\documents\github\springer-lidl\springerproblem\algorithm.c
+	"Algorithm.h"
+	"Move.h"
+	<stdlib.h>
+	<string.h>
+	<stdio.h>
+
+1480933232 c:\users\patrick\documents\github\springer-lidl\springerproblem\algorithm.h
+	<stdbool.h>
+	"Board.h"
+
+1481010023 c:\users\patrick\documents\github\springer-lidl\springerproblem\move.h
+	"Board.h"
+	<stdbool.h>
+
+1481028885 source:c:\users\patrick\documents\github\springer-lidl\springerproblem\move.c
+	"Move.h"
+	<stdlib.h>
+	<string.h>
+	<stdbool.h>
+	<assert.h>
+	<stdio.h>
 

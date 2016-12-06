@@ -26,7 +26,10 @@ HeuristicMoveList* heuristicMoveList_initialize();
 void heuristicMoveList_destruct(HeuristicMoveList* list);
 void heuristicMoveList_push(HeuristicMoveList* list, HeuristicMove* move);
 void heuristicMoveList_sort(HeuristicMoveList* list);
+unsigned int heuristicMoveList_getCount(HeuristicMoveList* list);
+HeuristicMove* heuristicMoveList_get(HeuristicMoveList* list, unsigned int index);
 
 MoveList* generateMoveList(Board* board, unsigned int x, unsigned int y, bool shouldOfferStart);
+HeuristicMoveList* generateHeuristic(Board* board, MoveList* moveList, bool shouldOfferStart);
 
 #endif // MOVE_H_INCLUDED

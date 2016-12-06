@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <stdio.h>
 
 struct Move
 {
@@ -83,9 +84,14 @@ unsigned int heuristicMove_getCount(HeuristicMove* move)
 
 MoveList* moveList_initialize()
 {
-    MoveList* moveList = (MoveList*)malloc(sizeof(Move)*8);
+    MoveList* moveList = malloc(sizeof(MoveList));
+    if(moveList == NULL)
+    {
+        perror("malloc failed");
+    }
     moveList->allocated = 8;
     moveList->dataCount = 0;
+    moveList->data = malloc(sizeof(Move)*8);
     return moveList;
 }
 
@@ -114,9 +120,10 @@ unsigned int moveList_getCount(MoveList* list)
 
 HeuristicMoveList* heuristicMoveList_initialize()
 {
-    HeuristicMoveList* moveList = (HeuristicMoveList*)malloc(sizeof(HeuristicMove)*8);
+    HeuristicMoveList* moveList = (HeuristicMoveList*)malloc(sizeof(HeuristicMoveList));
     moveList->allocated = 8;
     moveList->dataCount = 0;
+    moveList->data = malloc(sizeof(HeuristicMove)*8);
     return moveList;
 }
 
@@ -145,9 +152,43 @@ int heuristicComparator(const void* elem1, const void* elem2)
     return heuristic1->neighbourCount - heuristic2->neighbourCount;
 }
 
+void swapHeuristic(HeuristicMove* move1, HeuristicMove* move2)
+{
+    HeuristicMove tmp = *move1;
+    *move1 = *move2;
+    *move2 = tmp;
+}
+
 void heuristicMoveList_sort(HeuristicMoveList* list)
 {
-    qsort(list->data, list->dataCount, sizeof(HeuristicMove), heuristicComparator);
+    // qsort is not stable...
+    // qsort(list->data, list->dataCount, sizeof(HeuristicMove), heuristicComparator);
+    for(unsigned int outer = list->dataCount; outer; --outer)
+    {
+        bool didSwap = false;
+        for(unsigned int inner = 0; inner < (outer - 1); ++inner)
+        {
+            HeuristicMove* current = heuristicMoveList_get(list, inner);
+            HeuristicMove* next = heuristicMoveList_get(list, inner + 1);
+            if(current->neighbourCount > next->neighbourCount)
+            {
+                swapHeuristic(current, next);
+                didSwap = true;
+            }
+        }
+        if(!didSwap) break;
+    }
+}
+
+unsigned int heuristicMoveList_getCount(HeuristicMoveList* list)
+{
+    return list->dataCount;
+}
+
+HeuristicMove* heuristicMoveList_get(HeuristicMoveList* list, unsigned int index)
+{
+    assert(list->dataCount > index);
+    return &list->data[index];
 }
 
 bool checkBounds(Board* board, Move* move)
@@ -157,7 +198,7 @@ bool checkBounds(Board* board, Move* move)
 
 bool checkBoard(Board* board, Move* move, bool shouldOfferStart)
 {
-    return board_getValue(board, move_getX(move), move_getY(move)) == -1 || (shouldOfferStart && board_getValue(board, move_getX(move), move_getY(move)));
+    return board_getValue(board, move_getX(move), move_getY(move)) == -1 || (shouldOfferStart && board_getValue(board, move_getX(move), move_getY(move)) == 0);
 }
 
 Move* moveList_get(MoveList* list, unsigned int index)

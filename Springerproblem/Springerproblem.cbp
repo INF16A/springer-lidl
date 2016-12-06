@@ -31,6 +31,18 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="Algorithm.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Algorithm.h" />
+		<Unit filename="Board.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Board.h" />
+		<Unit filename="Move.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Move.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
