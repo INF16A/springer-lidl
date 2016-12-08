@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1481030749 source:c:\users\patrick\documents\github\springer-lidl\springerproblem\main.c
+1481033791 source:c:\users\patrick\documents\github\springer-lidl\springerproblem\main.c
 	<stdio.h>
 	<stdlib.h>
 	<stdbool.h>
@@ -12,7 +12,7 @@
 
 1481012953 c:\users\patrick\documents\github\springer-lidl\springerproblem\board.h
 
-1481031157 source:c:\users\patrick\documents\github\springer-lidl\springerproblem\algorithm.c
+1481033599 source:c:\users\patrick\documents\github\springer-lidl\springerproblem\algorithm.c
 	"Algorithm.h"
 	"Move.h"
 	<stdlib.h>

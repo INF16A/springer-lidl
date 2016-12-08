@@ -5,9 +5,9 @@
 
 int main()
 {
-    printf("=== Springerproblem (Team Lidl) ===\n");
-    printf("%s", "1. Offener Springerpfad\n");
-    printf("%s", "2. Geschlossener Springerpfad\n> ");
+    printf("=== Knights Tour (Team Lidl) ===\n");
+    printf("%s", "1. Open Knights Tour\n");
+    printf("%s", "2. Closed Knights Tour\n> ");
 
     int choice = 0;
     scanf("%d", &choice);
@@ -18,11 +18,11 @@ int main()
     else if(choice == 2)
         closed = true;
 
-    printf("%s", "Startpunkt im Format %d %d eingeben. Linke obere Ecke ist 0 0\n> ");
+    printf("%s", "Starting point. Format: %d %d\nLeft upper corner is 0 0\n> ");
     int x, y;
     scanf("%d %d", &x, &y);
 
-    printf("%s", "Brettgroesse angeben. Format: %d\n> ");
+    printf("%s", "Board size. Format: %d\n> ");
     int boardSize;
     scanf("%d", &boardSize);
 

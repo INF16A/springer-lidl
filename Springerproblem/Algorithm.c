@@ -146,7 +146,7 @@ Result* knightsTour(unsigned int boardSize, unsigned int x, unsigned int y, bool
     }
     else
     {
-        printf("%s", "Keine Lösung gefunden");
+        printf("%s", "No solution found");
     }
     return result;
 }
