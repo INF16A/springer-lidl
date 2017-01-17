@@ -4,32 +4,78 @@
 #include "Board.h"
 #include <stdbool.h>
 
-typedef struct Move Move;
-typedef struct HeuristicMove HeuristicMove;
-typedef struct MoveList MoveList;
-typedef struct HeuristicMoveList HeuristicMoveList;
+/*
+ * Move destination, defined by x and y
+ */
+typedef struct Move
+{
+    unsigned int x;
+    unsigned int y;
+} Move;
 
-unsigned int move_getX(Move* move);
-unsigned int move_getY(Move* move);
+/*
+ * Warnsdorf heuristic: sort the next moves by available neighbors in ascending order
+ * This struct holds the data needed by the heuristic.
+ * move: An instance of the above Move struct
+ * neighborCount: How many further moves are possible for the given move
+ */
+typedef struct HeuristicMove
+{
+    Move move;
+    unsigned int neighborCount;
+} HeuristicMove;
 
-unsigned int heuristicMove_getX(HeuristicMove* move);
-unsigned int heuristicMove_getY(HeuristicMove* move);
-unsigned int heuristicMove_getCount(HeuristicMove* move);
+/*
+ * Move list holds at maximum 8 moves
+ * data: the moves in the MoveList
+ * dataCount: how many moves are stored in the data array
+ */
+typedef struct MoveList
+{
+    Move data[8];
+    unsigned int dataCount;
+} MoveList;
 
-MoveList* moveList_initialize();
-void moveList_destruct(MoveList* list);
+/*
+ * The heuristic version of the above MoveList
+ * data: the heuristic moves in the HeuristicMoveList
+ * dataCount: how many heuristic moves are stored in the data array
+ */
+typedef struct HeuristicMoveList
+{
+    HeuristicMove data[8];
+    unsigned int dataCount;
+} HeuristicMoveList;
+
+/*
+ * Initializes the move list members
+ */
+void moveList_initialize(MoveList* moveList);
+/*
+ * Adds a Move to the end of the move list
+ */
 void moveList_push(MoveList* list, Move* move);
-unsigned int moveList_getCount(MoveList* list);
+/*
+ * Returns a pointer to a move by index
+ */
 Move* moveList_get(MoveList* list, unsigned int index);
 
-HeuristicMoveList* heuristicMoveList_initialize();
-void heuristicMoveList_destruct(HeuristicMoveList* list);
+/*
+ * Adds a heuristic move to the heuristic move list
+ */
 void heuristicMoveList_push(HeuristicMoveList* list, HeuristicMove* move);
+/*
+ * A stable sort for the heuristic move list in order to implement the Warnsdorf heuristic
+ */
 void heuristicMoveList_sort(HeuristicMoveList* list);
-unsigned int heuristicMoveList_getCount(HeuristicMoveList* list);
-HeuristicMove* heuristicMoveList_get(HeuristicMoveList* list, unsigned int index);
 
-MoveList* generateMoveList(Board* board, unsigned int x, unsigned int y, bool shouldOfferStart);
-HeuristicMoveList* generateHeuristic(Board* board, MoveList* moveList, bool shouldOfferStart);
+/*
+ * Returns all moves that are possible given the current state of the board and the current position
+ */
+MoveList generateMoveList(Board* board, unsigned int x, unsigned int y, bool shouldOfferStart);
+/*
+ * Returns a sorted list of all moves in the move list with their neighbor count
+ */
+HeuristicMoveList generateHeuristic(Board* board, MoveList* moveList, bool shouldOfferStart);
 
 #endif // MOVE_H_INCLUDED

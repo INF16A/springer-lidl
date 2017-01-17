@@ -1,38 +1,22 @@
 #include "Board.h"
 #include <stdlib.h>
 #include <stdio.h>
-struct Board
-{
-    unsigned int boardSize;
-    int* data;
-};
 
-Board* board_initialize(unsigned int boardSize)
+void board_initialize(Board* board, unsigned int boardSize)
 {
-    Board* board = (Board*)malloc(sizeof(Board));
     board->boardSize = boardSize;
     board->data = (int*)malloc((board->boardSize * board->boardSize)*sizeof(int));
+
+    // Initialize board data with -1 for not visited
     for(unsigned int i = 0; i < (board->boardSize*board->boardSize); ++i)
     {
         board->data[i] = -1;
     }
-    return board;
 }
 
 void board_destruct(Board* board)
 {
     free(board->data);
-    free(board);
-}
-
-Board* board_copy(Board* board)
-{
-    Board* boardCopy = board_initialize(board->boardSize);
-    for(unsigned i = 0; i < board->boardSize*board->boardSize; ++i)
-    {
-        boardCopy->data[i] = board->data[i];
-    }
-    return boardCopy;
 }
 
 int board_getValue(Board* board, unsigned int x, unsigned int y)
@@ -40,33 +24,9 @@ int board_getValue(Board* board, unsigned int x, unsigned int y)
     return board->data[y * board->boardSize + x];
 }
 
-int board_getValueByIndex(Board* board, unsigned int index)
-{
-    return board->data[index];
-}
-
 void board_setValue(Board* board, unsigned int x, unsigned int y, int value)
 {
     board->data[y * board->boardSize + x] = value;
-}
-
-unsigned int board_getSize(Board* board)
-{
-    return board->boardSize;
-}
-
-const char* board_locationToString(unsigned int x, unsigned int y)
-{
-    char* buffer = malloc(3);
-    buffer[0] = (char)(y + 'A');
-    buffer[1] = (char)(x + '0');
-    buffer[2] = '\0';
-    return buffer;
-}
-
-const char* board_indexToString(Board* board, unsigned int index)
-{
-    return board_locationToString(index%board_getSize(board), index/board_getSize(board));
 }
 
 void board_print(Board* board)
@@ -85,6 +45,8 @@ void board_print(Board* board)
             int value = board_getValue(board, x, y);
             if(value == -1)
                 printf("% 3c", 'x');
+            else if(value == board->boardSize*board->boardSize)
+                printf("% 3c", 'X');
             else
                 printf("% 3d", value);
         }
@@ -96,4 +58,23 @@ void board_print(Board* board)
         printf("%s", "---");
     }
     puts("|");
+}
+
+void board_rewriteClosed(Board* board, unsigned int rx, unsigned int ry)
+{
+    // Calculate the new values by applying
+    // value = value - offset MOD boardsize^2
+    int relative = board_getValue(board, rx, ry);
+    if(relative == 0) return;
+    unsigned int boardSize = board->boardSize*board->boardSize;
+    for(unsigned int x = 0; x < board->boardSize; ++x)
+    {
+        for(unsigned int y = 0; y < board->boardSize; ++y)
+        {
+            // C modulo returns negative values, but we want it to wrap around
+            // We add boardSize again to make sure it will be positive after modulo
+            int newVal = (((board_getValue(board, x, y) - relative) % boardSize) + boardSize) % boardSize;
+            board_setValue(board, x, y, newVal);
+        }
+    }
 }

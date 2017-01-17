@@ -2,24 +2,10 @@
 #define ALGORITHM_H_INCLUDED
 
 #include <stdbool.h>
-#include "Board.h"
 
-typedef struct Result Result;
-typedef struct ResultPath ResultPath;
-
-Result* result_initialize(bool status, Board* board);
-void result_destruct(Result* result);
-
-bool result_getStatus(Result* result);
-void result_setStatus(Result* result, bool status);
-
-Board* result_getBoard(Result* result);
-void result_setBoard(Result* result, Board* board);
-
-ResultPath* resultPath_initialize(Result* result);
-void resultPath_destruct(ResultPath* path);
-const char* resultPath_toString(ResultPath* path);
-
-Result* knightsTour(unsigned int boardSize, unsigned int x, unsigned int y, bool closedTour);
+/*
+ * Solve a knights tour for a given board size, start position and whether it should be closed
+ */
+void knightsTour(unsigned int boardSize, unsigned int x, unsigned int y, bool closedTour);
 
 #endif // ALGORITHM_H_INCLUDED

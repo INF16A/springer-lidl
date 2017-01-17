@@ -1,152 +1,90 @@
+#include "Board.h"
 #include "Algorithm.h"
 #include "Move.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+/*
+ * Module local iteration counter
+ */
+static int iterationCount;
 
-int iterationCount;
-
-struct Result
-{
-    bool status;
-    Board* board;
-};
-
-struct ResultPath
-{
-    unsigned int length;
-    char* data;
-};
-
-Result* result_initialize(bool status, Board* board)
-{
-    Result* result = malloc(sizeof(Result));
-    result->status = status;
-    result->board = board;
-    return result;
-}
-
-void result_destruct(Result* result)
-{
-    free(result);
-}
-
-bool result_getStatus(Result* result)
-{
-    return result->status;
-}
-
-void result_setStatus(Result* result, bool status)
-{
-    result->status = status;
-}
-
-Board* result_getBoard(Result* result)
-{
-    return result->board;
-}
-
-void result_setBoard(Result* result, Board* board)
-{
-    result->board = board;
-}
-
-ResultPath* resultPath_initialize(Result* result)
-{
-    ResultPath* path = malloc(sizeof(ResultPath));
-
-    unsigned int boardSize = board_getSize(result->board);
-    path->length = 3 * (boardSize * boardSize);
-    path->data = malloc(path->length);
-    memset(path->data, '\x20', path->length);
-
-    for(unsigned int pathIndex = 0; pathIndex < boardSize*boardSize; ++pathIndex)
-    {
-        for(unsigned int boardIndex = 0; boardIndex < boardSize*boardSize; ++boardIndex)
-        {
-            if(board_getValueByIndex(result->board, boardIndex) == pathIndex)
-                memcpy(&path->data[3*pathIndex], board_indexToString(result->board, boardIndex), 2);
-        }
-    }
-    path->data[path->length - 1] = '\0';
-    return path;
-}
-
-void resultPath_destruct(ResultPath* path)
-{
-    free(path->data);
-    free(path);
-}
-
-const char* resultPath_toString(ResultPath* path)
-{
-    return path->data;
-}
-
-Result* tryPath(Board* board, unsigned int x, unsigned int y, unsigned int n, bool closedTour)
+/*
+ * Recursive function, tries the given move on the given board and all subsequent moves by the Warnsdorf heuristic
+ * board: pointer to the Board structure
+ * x: x-value of the move
+ * y: y-value of the move
+ * n: current recursion depth
+ * closedTour: whether the tour should be closed or not
+ */
+bool tryPath(Board* board, unsigned int x, unsigned int y, unsigned int n, bool closedTour)
 {
     ++iterationCount;
 
-    unsigned int boardSize = board_getSize(board);
+    unsigned int boardSize = board->boardSize;
+    // Set (x|y) to n to mark that we were here
     board_setValue(board, x, y, n);
 
+    // If the iteration counter is greater than the number of fields, we have backtracked and the heuristic has failed
     if(iterationCount == (boardSize*boardSize + 1))
         printf("Warnsdorf failed, resorting to backtracking\n");
 
-    /*
-    board_print(board);
-    printf("%d %d\n", n, iterationCount);
-    system("pause");
-    */
-    if(closedTour)
+    // If the recursion depth is equal to the number of fields, we have found a solution!
+    // If we have an open tour, we must subtract one because n starts at 0,
+    // If we have a closed tour then we don't subtract anything
+    if(n == (boardSize*boardSize - !closedTour))
     {
-        if(n == (boardSize*boardSize))
-            return result_initialize(true, board);
-    } else {
-        if(n == (boardSize*boardSize - 1))
-            return result_initialize(true, board);
+        return true;
     }
 
+    // This decides if the starting point should be included in the possible move list.
+    // That is the case when we are searching for a closed tour and when we are one field before the solution
     bool shouldOfferStart = (closedTour && n == (boardSize * boardSize) - 1);
-    MoveList* moveList = generateMoveList(board, x, y, shouldOfferStart);
-    HeuristicMoveList* list = generateHeuristic(board, moveList, shouldOfferStart);
+    MoveList moveList = generateMoveList(board, x, y, shouldOfferStart);
+    HeuristicMoveList list = generateHeuristic(board, &moveList, shouldOfferStart);
 
-    for(unsigned int i = 0; i < heuristicMoveList_getCount(list); ++i)
+    // Go through all possible moves, sorted by the heuristic
+    for(unsigned int i = 0; i < list.dataCount; ++i)
     {
-        Board* boardCopy = board_copy(board);
-        HeuristicMove* move = heuristicMoveList_get(list, i);
-        Result* result = tryPath(boardCopy, heuristicMove_getX(move), heuristicMove_getY(move), n+1, closedTour);
-        if(result_getStatus(result))
+        HeuristicMove* move = &list.data[i];
+        bool result = tryPath(board, move->move.x, move->move.y, n+1, closedTour);
+        if(result)
         {
-            heuristicMoveList_destruct(list);
-            moveList_destruct(moveList);
-            board_destruct(board);
-            return result;
+            // We have found a solution in a deeper recursion depth, report that to the calls above us and the knightsTour function
+            return true;
         }
-        board_destruct(boardCopy);
-        result_destruct(result);
     }
-
-    heuristicMoveList_destruct(list);
-    moveList_destruct(moveList);
-    return result_initialize(false, NULL);
+    // This branch did not result in a solution, "unvisit" this field and return false
+    board_setValue(board, x, y, -1);
+    return false;
 }
 
-Result* knightsTour(unsigned int boardSize, unsigned int x, unsigned int y, bool closedTour)
+void knightsTour(unsigned int boardSize, unsigned int x, unsigned int y, bool closedTour)
 {
     iterationCount = 0;
-    Board* board = board_initialize(boardSize);
-    Result* result = tryPath(board, x, y, 0, closedTour);
-    if(result_getStatus(result))
+    Board board;
+    board_initialize(&board, boardSize);
+    bool result = false;
+    if(closedTour)
     {
-        /*ResultPath* path = resultPath_initialize(result);
-        printf("%s", resultPath_toString(path));
-        resultPath_destruct(path);*/
-        board_print(result->board);
+        result = tryPath(&board, 0, 0, 0, closedTour);
+        if(result)
+        {
+            board_rewriteClosed(&board, x, y);
+        }
+    }
+    else
+    {
+        result = tryPath(&board, x, y, 0, closedTour);
+    }
+
+    if(result)
+    {
+        board_print(&board);
     }
     else
     {
         printf("%s", "No solution found");
     }
-    return result;
+    board_destruct(&board);
 }
