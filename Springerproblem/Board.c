@@ -60,6 +60,11 @@ void board_print(Board* board)
     puts("|");
 }
 
+/*
+ * A closed path can be converted into a closed path with another starting position by just starting it at another position.
+ * We can do that on our calculated board by taking the starting position as our new zero and calculate each cell given by
+ * the formula below. This was done because the calculation in some starting positions was really slow.
+ */
 void board_rewriteClosed(Board* board, unsigned int rx, unsigned int ry)
 {
     // Calculate the new values by applying

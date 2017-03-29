@@ -164,6 +164,11 @@ unsigned int generateMoveCount(Board* board, unsigned int x, unsigned int y, boo
     return moveCount;
 }
 
+/*
+ * The Warnsdorf heuristic works by the following principle: Fields which are accessible by not many other fields
+ * only will be even less accessible in the future. So we will visit these fields before the other fields. The
+ * heuristic finds a solution on the first try on most of the fields.
+ */
 HeuristicMoveList generateHeuristic(Board* board, MoveList* moveList, bool shouldOfferStart)
 {
     HeuristicMoveList heuristicMoveList;
